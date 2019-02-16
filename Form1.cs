@@ -15,7 +15,6 @@ using Google.Apis.Services;
 using Google.Apis.Vision.v1.Data;
 using System.Diagnostics;
 using System.Net;
-//using mshtml;
 using mshtml;
 using Moda.Korean.TwitterKoreanProcessorCS;
 using Newtonsoft.Json;
@@ -47,8 +46,6 @@ namespace WindowsFormsApplication2
             pic_y = pictureBox1.Location.Y;
 
             //webBrowser4.Navigate("http://alldic.daum.net/grammar_checker.do"); //다음 맞춤
-
-            //wiki_QA("휘게는 어느나라어 인가?");
         }
         
         private void button1_Click(object sender, EventArgs e)
@@ -137,7 +134,6 @@ namespace WindowsFormsApplication2
             if (e.Url.AbsoluteUri == webBrowser1.Url.AbsoluteUri)
             {
                 high_light(1,1);
-                //textBox8.Text += "\n" + "1:" + stopwatch.Elapsed.ToString();
                 print_answer();
             }
         }
@@ -146,7 +142,6 @@ namespace WindowsFormsApplication2
             if (e.Url.AbsoluteUri == webBrowser2.Url.AbsoluteUri)
             {
                 high_light(2,1);
-                //textBox8.Text += "\n" + "2:" + stopwatch.Elapsed.ToString();
                 print_answer();
             }
 
@@ -156,7 +151,6 @@ namespace WindowsFormsApplication2
             if (e.Url.AbsoluteUri == webBrowser3.Url.AbsoluteUri)
             {
                 high_light(3,1);
-                //textBox8.Text += "\n" + "3:" + stopwatch.Elapsed.ToString();
                 print_answer();
             }
         }
@@ -287,10 +281,6 @@ namespace WindowsFormsApplication2
             {
                 textBox8.Text += "구글요약";
             }
-            else if (num == 4)
-            {
-                //textBox8.Text += "구글문요약";
-            }
             textBox8.Text += "\r\n";
         }
 
@@ -311,10 +301,7 @@ namespace WindowsFormsApplication2
                 StreamReader reader = new StreamReader(stream);//, Encoding.UTF8);
 
                 // 응답 Stream -> 응답 String 변환
-
-
                 string HTMLString = reader.ReadToEnd();
-
 
                 List<string> SearchWords = new List<string>();
 
@@ -369,14 +356,15 @@ namespace WindowsFormsApplication2
             }
         }
 
-        private void naver_api(string query,int type, int mul, string name)
+        private void Naver_Api(string query,string type, int mul, string name)
         {
             int[] count = new int[4];
 
             string display = "100";   // display 10~100까지 읽음
             string sort = "sim";     // sort sim(유사도순) date(날짜순)
 
-            string url = ""; //= "https://openapi.naver.com/v1/search/blog?query=" + query + "&display=" + display + "&sort=" + sort; // 결과가 JSON 포맷
+            string url = "https://openapi.naver.com/v1/search/" + type +"?query=" + query + "&display=" + display + "&sort=" + sort; // 결과가 JSON 포맷
+            /*
             switch (type)
             {
                 case 0:
@@ -396,12 +384,7 @@ namespace WindowsFormsApplication2
                     url = "https://openapi.naver.com/v1/search/doc?query=" + query + "&display=" + display + "&sort=" + sort; // 결과가 JSON 포맷
                     break;
             }
-            
-            // https://openapi.naver.com/v1/search/news.json 뉴스
-            // https://openapi.naver.com/v1/search/encyc.json 백과사전
-            // https://openapi.naver.com/v1/search/webkr.json 웹문서
-            // https://openapi.naver.com/v1/search/doc.json 전문자료
-
+            */
             HttpWebRequest request = (HttpWebRequest)WebRequest.Create(url);
 
             string c_id = "1kwVZ3_v8s26Ix9WWfhN";
@@ -428,7 +411,6 @@ namespace WindowsFormsApplication2
                     break;
             }
             */
-
             request.Headers.Add("X-Naver-Client-Id", c_id); // 클라이언트 아이디
             request.Headers.Add("X-Naver-Client-Secret", c_pw);       // 클라이언트 시크릿
 
@@ -486,29 +468,9 @@ namespace WindowsFormsApplication2
             }
             catch (WebException e)
             {
-                /*
-                key1.total = 999999;
-                resp--;
-                Console.WriteLine(e.Message.ToString());
-
-                if (resp == 0)   // 50번 예외처리 되면 끄자
-                {
-                    thisDay2 = DateTime.Now;   // 18.02.19a
-
-                    //Console.WriteLine((thisDay2 - thisDay).ToString());    // 18.02.19a
-
-                    //sw3.WriteLine(count_request + "\t" + count_all + "\t" + (thisDay2 - thisDay).ToString());    // 18.02.19a
-
-                    Delay(7200000); //  2hour 멈춤
-                    resp = 20;
-                }
-                Delay(1000); //  1s 멈춤
-                */
             }
-
             textBox8.Text += "  " + stopwatch.Elapsed.ToString();
             textBox8.Text += ":  " + count[0].ToString() + " " + count[1].ToString() + " " + count[2].ToString() + " " + count[3].ToString() + " " + name + "\r\n";
-
         }
 
         private void textBox7_KeyDown(object sender, KeyEventArgs e)
@@ -518,7 +480,6 @@ namespace WindowsFormsApplication2
                 capture_and_search();
             }
         }
-
         private void summary_qna()
         {
             // 필요없는 문구 없애기
@@ -616,7 +577,7 @@ namespace WindowsFormsApplication2
 
         }
 
-        private void wiki_QA(string question)
+        private void Wiki_QA(string question)
         {
             var httpWebRequest = (HttpWebRequest)WebRequest.Create("http://aiopen.etri.re.kr:8000/WikiQA");
             httpWebRequest.ContentType = "text/json";
@@ -630,9 +591,6 @@ namespace WindowsFormsApplication2
                                   "  \"question\": \"" + question +"\"" +
                                   "   }" +
                                   "}";
-
-                //// \"request_id\": \"reserved field\", " +
-
                 streamWriter.Write(json);
             }
             var httpResponse = (HttpWebResponse)httpWebRequest.GetResponse();
@@ -834,14 +792,14 @@ namespace WindowsFormsApplication2
             //string url6 = "http://alldic.daum.net/grammar_checker.do"; // 다음 맞춤법 
             string url7 = "https://search.daum.net/search?w=tot&DA=YZR&t__nil_searchbox=btn&sug=&sugo=&q=" + utf8String; // 다음 검색
             
-            naver_api(question, 0, 1, "API 블로그");
-            naver_api(question, 1, 1, "API 뉴스");
-            naver_api(question, 2, 1, "API 백과사전");
-           // naver_api(question, 3, 1, "API 웹문서");
-           // naver_api(question, 4, 1, "API 전문자료");
-
-            naver_api(summary, 0, 1, "API summary");
-            naver_api(summary2, 0, 1, "API summary2");
+            Naver_Api(question, "blog", 1, "API 블로그");
+            Naver_Api(question, "news", 1, "API 뉴스");
+            Naver_Api(question, "encyc", 1, "API 백과사전");
+           // Naver_Api(question, "webkr", 1, "API 웹문서");
+           // Naver_Api(question, "doc", 1, "API 전문자료");
+           
+            Naver_Api(summary, 0, 1, "API summary");
+            Naver_Api(summary2, 0, 1, "API summary2");
 
             // Internet Browser
             webBrowser1.Navigate(url2_1); //Google + 문 // +5 
@@ -849,7 +807,7 @@ namespace WindowsFormsApplication2
             //webBrowser3.Navigate(url2); //Google + 문답
             webBrowser3.Navigate(url2_2); //Google + 문 요약
                                           //webBrowser4.Navigate(url5);
-            //wiki_QA(question);
+            //Wiki_QA(question);
 
             print_answer();
 

@@ -49,13 +49,8 @@ namespace WindowsFormsApplication2
             //webBrowser4.Navigate("http://alldic.daum.net/grammar_checker.do"); //다음 맞춤
 
             //wiki_QA("휘게는 어느나라어 인가?");
-
-
-
         }
-
-
-
+        
         private void button1_Click(object sender, EventArgs e)
         {
             // <19.01.12a
@@ -756,10 +751,7 @@ namespace WindowsFormsApplication2
                     }
                 }
             }
-
             summary_qna();  // 문답 정리
-
-
             ////////////////////////////////////// 검색 단계 //////////////////////////////////////
 
             //UTF8로 바꾸기
@@ -816,10 +808,6 @@ namespace WindowsFormsApplication2
                 utf8StringQA4 += "%" + String.Format("{0:X}", b);
             }
 
-
-
-
-
             string url1 = "https://search.naver.com/search.naver?where=nexearch&sm=top_hty&fbm=1&ie=utf8&query=" + utf8String;  // Naver
             string url1_1 = "https://search.naver.com/search.naver?where=nexearch&sm=top_hty&fbm=1&ie=utf8&query=" + utf8StringSum; //Naver 요약
 
@@ -852,11 +840,8 @@ namespace WindowsFormsApplication2
            // naver_api(question, 3, 1, "API 웹문서");
            // naver_api(question, 4, 1, "API 전문자료");
 
-           
-
             naver_api(summary, 0, 1, "API summary");
             naver_api(summary2, 0, 1, "API summary2");
-
 
             // Internet Browser
             webBrowser1.Navigate(url2_1); //Google + 문 // +5 
@@ -864,7 +849,6 @@ namespace WindowsFormsApplication2
             //webBrowser3.Navigate(url2); //Google + 문답
             webBrowser3.Navigate(url2_2); //Google + 문 요약
                                           //webBrowser4.Navigate(url5);
-
             //wiki_QA(question);
 
             print_answer();

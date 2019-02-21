@@ -45,6 +45,16 @@ namespace WindowsFormsApplication2
             pic_x = pictureBox1.Location.X;
             pic_y = pictureBox1.Location.Y;
 
+            progressBar1.Minimum = 0;
+            progressBar2.Minimum = 0;
+            progressBar3.Minimum = 0;
+            progressBar4.Minimum = 0;
+
+            progressBar1.Maximum = 100;
+            progressBar2.Maximum = 100;
+            progressBar3.Maximum = 100;
+            progressBar4.Maximum = 100;
+
             //webBrowser4.Navigate("http://alldic.daum.net/grammar_checker.do"); //다음 맞춤
         }
         
@@ -57,6 +67,27 @@ namespace WindowsFormsApplication2
             this.num[3] = 0;
             // 19.01.12a>
             capture_and_search();
+        }
+
+        private void button2_Click(object sender, EventArgs e)
+        {
+            // Capture
+            Bitmap bitmap = new Bitmap(this.pictureBox1.Width, this.pictureBox1.Height);
+            Graphics graphics = Graphics.FromImage(bitmap);
+            graphics.CopyFromScreen(PointToScreen(new Point(this.pictureBox1.Location.X, this.pictureBox1.Location.Y)), new Point(0, 0), pictureBox1.Size);
+
+            pictureBox2.Image = bitmap;
+        }
+
+
+        private void button3_Click(object sender, EventArgs e)
+        {
+            using (System.IO.StreamWriter file =
+            new System.IO.StreamWriter("QfeatQnA.txt", true))
+            {
+                string a = checkedListBox1.CheckedItems.ToString();
+                file.WriteLine(a);
+            }
         }
 
         public static byte[] ImageToByte(System.Drawing.Image img)
@@ -79,6 +110,8 @@ namespace WindowsFormsApplication2
 
         private void init_qna()
         {
+
+
             for (int i = 0; i < 4; i++)
             {
                 this.answer[i] = "";
@@ -174,6 +207,48 @@ namespace WindowsFormsApplication2
                 textBox7.Text += (max_num + 1).ToString() + ": " + answer[max_num] + " " + (max * 100/total).ToString() + "%";
             }
 
+            for (int i = 0; i < 4; i++)
+            {
+                switch (i)
+                {
+                    case 0:
+                         progressBar1.Value = num[i] *100 / total;
+                        break;
+                    case 1:
+                        progressBar2.Value = num[i] * 100 / total;
+                        break;
+                    case 2:
+                        progressBar3.Value = num[i] * 100 / total;
+                        break;
+                    case 3:
+                        progressBar4.Value = num[i] * 100 / total;
+                        break;
+                    default:
+                        break;
+                }
+            }
+
+            radioButton1.Checked = false;
+            radioButton1.Checked = false;
+            radioButton1.Checked = false;
+            radioButton1.Checked = false;
+            switch (max_num)
+            {
+                case 0:
+                    radioButton1.Checked = true;
+                    break;
+                case 1:
+                    radioButton2.Checked = true;
+                    break;
+                case 2:
+                    radioButton3.Checked = true;
+                    break;
+                case 3:
+                    radioButton4.Checked = true;
+                    break;
+                default:
+                    break;
+            }
         }
 
         public int WordCheck(string String, string Word)
@@ -608,6 +683,7 @@ namespace WindowsFormsApplication2
 
         }
 
+
         private void capture_and_search()
         {
             // Timer
@@ -617,7 +693,6 @@ namespace WindowsFormsApplication2
 
             // initial
             init_qna();
-
 
             // Capture
             Bitmap bitmap = new Bitmap(this.pictureBox1.Width, this.pictureBox1.Height);
@@ -798,9 +873,14 @@ namespace WindowsFormsApplication2
            // Naver_Api(question, "webkr", 1, "API 웹문서");
            // Naver_Api(question, "doc", 1, "API 전문자료");
            
-            Naver_Api(summary, 0, 1, "API summary");
-            Naver_Api(summary2, 0, 1, "API summary2");
+            Naver_Api(summary, "blog", 1, "API summary");
+            //Naver_Api(summary2, "blog", 1, "API summary2");
 
+            foreach(string str in answer)
+            {
+                Naver_Api(str + " " + summary, "blog", 0, "API 문제포함");
+            }
+           
             // Internet Browser
             webBrowser1.Navigate(url2_1); //Google + 문 // +5 
             //webBrowser2.Navigate(url7); // 다음검색

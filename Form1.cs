@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -31,7 +31,7 @@ namespace WindowsFormsApplication2
         string summary2;
         int[] number = new int[4];
         int answer_cnt;
-        Stopwatch stopwatch = new Stopwatch();
+        Stopwatch stopwatch = new Stopwatch(); 
 
         public Form1()
         {
@@ -54,7 +54,8 @@ namespace WindowsFormsApplication2
             progressBar2.Maximum = 100;
             progressBar3.Maximum = 100;
             progressBar4.Maximum = 100;
-
+            
+            KeyPreview = true;
             //webBrowser4.Navigate("http://alldic.daum.net/grammar_checker.do"); //다음 맞춤
         }
         
@@ -68,7 +69,6 @@ namespace WindowsFormsApplication2
             // 19.01.12a>
             capture_and_search();
         }
-
         private void button2_Click(object sender, EventArgs e)
         {
             // Capture
@@ -79,14 +79,16 @@ namespace WindowsFormsApplication2
             pictureBox2.Image = bitmap;
         }
 
-
         private void button3_Click(object sender, EventArgs e)
         {
             using (System.IO.StreamWriter file =
             new System.IO.StreamWriter("QfeatQnA.txt", true))
             {
-                string a = checkedListBox1.CheckedItems.ToString();
-                file.WriteLine(a);
+                file.WriteLine(question);
+                file.WriteLine(answer[0]);
+                file.WriteLine(answer[1]);
+                file.WriteLine(answer[2]);
+                file.WriteLine(answer[3]);
             }
         }
 
@@ -110,8 +112,6 @@ namespace WindowsFormsApplication2
 
         private void init_qna()
         {
-
-
             for (int i = 0; i < 4; i++)
             {
                 this.answer[i] = "";
@@ -126,7 +126,6 @@ namespace WindowsFormsApplication2
             textBox1.BackColor = System.Drawing.Color.White;
 
             // 삭제 문구
-
             string[] lines1 = System.IO.File.ReadAllLines("erase.txt", Encoding.Default);
             foreach (string line in lines1)
             {
@@ -227,24 +226,28 @@ namespace WindowsFormsApplication2
                         break;
                 }
             }
+            radioButton1.Checked = false;
+            radioButton2.Checked = false;
+            radioButton3.Checked = false;
+            radioButton4.Checked = false;
 
-            radioButton1.Checked = false;
-            radioButton1.Checked = false;
-            radioButton1.Checked = false;
-            radioButton1.Checked = false;
             switch (max_num)
             {
                 case 0:
                     radioButton1.Checked = true;
+                    textBox2.Color = Color.yellow;
                     break;
                 case 1:
                     radioButton2.Checked = true;
+                    textBox3.Text = Color.yellow;
                     break;
                 case 2:
                     radioButton3.Checked = true;
+                     textBox4.Text = Color.yellow;
                     break;
                 case 3:
                     radioButton4.Checked = true;
+                     textBox5.Text = Color.yellow;
                     break;
                 default:
                     break;
@@ -439,27 +442,7 @@ namespace WindowsFormsApplication2
             string sort = "sim";     // sort sim(유사도순) date(날짜순)
 
             string url = "https://openapi.naver.com/v1/search/" + type +"?query=" + query + "&display=" + display + "&sort=" + sort; // 결과가 JSON 포맷
-            /*
-            switch (type)
-            {
-                case 0:
-                    url = "https://openapi.naver.com/v1/search/blog?query=" + query + "&display=" + display + "&sort=" + sort; // 결과가 JSON 포맷
-                    break;
-                case 1:
-                    url = "https://openapi.naver.com/v1/search/news?query=" + query + "&display=" + display + "&sort=" + sort; // 결과가 JSON 포맷
-                    break;
-                case 2:
-                    url = "https://openapi.naver.com/v1/search/encyc?query=" + query + "&display=" + display + "&sort=" + sort; // 결과가 JSON 포맷
-                    break;
 
-                case 3:
-                    url = "https://openapi.naver.com/v1/search/webkr?query=" + query + "&display=" + display + "&sort=" + sort; // 결과가 JSON 포맷
-                    break;
-                case 4:
-                    url = "https://openapi.naver.com/v1/search/doc?query=" + query + "&display=" + display + "&sort=" + sort; // 결과가 JSON 포맷
-                    break;
-            }
-            */
             HttpWebRequest request = (HttpWebRequest)WebRequest.Create(url);
 
             string c_id = "1kwVZ3_v8s26Ix9WWfhN";
@@ -678,11 +661,8 @@ namespace WindowsFormsApplication2
                 dynamic array = JsonConvert.DeserializeObject(responseText);
 
                 textBox9.Text = array.return_object.WiKiInfo.AnswerInfo.ToString();
-               // textBox9.Text = array.return_object
             }
-
         }
-
 
         private void capture_and_search()
         {

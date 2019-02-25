@@ -19,6 +19,12 @@ using mshtml;
 using Moda.Korean.TwitterKoreanProcessorCS;
 using Newtonsoft.Json;
 
+using System.Runtime.InteropServices;
+using System.Drawing.Imaging;
+using Image = System.Drawing.Image;
+using System.Threading;
+using Color = System.Drawing.Color;
+
 namespace WindowsFormsApplication2
 {
     public partial class Form1 : Form
@@ -31,19 +37,21 @@ namespace WindowsFormsApplication2
         string summary2;
         int[] number = new int[4];
         int answer_cnt;
-        Stopwatch stopwatch = new Stopwatch(); 
+        Stopwatch stopwatch = new Stopwatch();
+        IntPtr ptr_quiz;
 
         public Form1()
         {
             InitializeComponent();
+            /*
             hScrollBar1.Minimum = 200;
             hScrollBar1.Maximum = pictureBox1.Width;
 
             vScrollBar1.Minimum = 300;
             vScrollBar1.Maximum = pictureBox1.Height;
-
-            pic_x = pictureBox1.Location.X;
-            pic_y = pictureBox1.Location.Y;
+            */
+            //pic_x = pictureBox1.Location.X;
+            //pic_y = pictureBox1.Location.Y;
 
             progressBar1.Minimum = 0;
             progressBar2.Minimum = 0;
@@ -72,11 +80,14 @@ namespace WindowsFormsApplication2
         private void button2_Click(object sender, EventArgs e)
         {
             // Capture
+            print_picture();
+            /*
             Bitmap bitmap = new Bitmap(this.pictureBox1.Width, this.pictureBox1.Height);
             Graphics graphics = Graphics.FromImage(bitmap);
             graphics.CopyFromScreen(PointToScreen(new Point(this.pictureBox1.Location.X, this.pictureBox1.Location.Y)), new Point(0, 0), pictureBox1.Size);
 
             pictureBox2.Image = bitmap;
+            */
         }
 
         private void button3_Click(object sender, EventArgs e)
@@ -84,11 +95,112 @@ namespace WindowsFormsApplication2
             using (System.IO.StreamWriter file =
             new System.IO.StreamWriter("QfeatQnA.txt", true))
             {
+                // First Line
+                if (radioButton5.Checked == true)
+                {
+                    file.WriteLine("2");
+                    textBox2.Text = "O";
+                    textBox3.Text = "X";
+                }
+                else if (radioButton6.Checked == true)
+                {
+                    file.WriteLine("3");
+                }
+                else if (radioButton7.Checked == true)
+                {
+                    file.WriteLine("4");
+                }
+                else
+                {
+                    file.WriteLine("-1");
+                }
+
+                // Second line
+                if (radioButton1.Checked == true)
+                {
+                    file.WriteLine("1");
+                }
+                else if(radioButton2.Checked == true)
+                {
+                    file.WriteLine("2");
+                }
+                else if(radioButton3.Checked == true)
+                {
+                    file.WriteLine("3");
+                }
+                else if(radioButton4.Checked == true)
+                {
+                    file.WriteLine("4");
+                }
+                else
+                {
+                    file.WriteLine("-1");
+                }
+
                 file.WriteLine(question);
-                file.WriteLine(answer[0]);
-                file.WriteLine(answer[1]);
-                file.WriteLine(answer[2]);
-                file.WriteLine(answer[3]);
+                file.WriteLine(textBox2.Text);
+                file.WriteLine(textBox3.Text);
+                if (radioButton5.Checked == false)
+                {
+                    file.WriteLine(textBox4.Text);
+                }
+                if (radioButton5.Checked == false && radioButton6.Checked == false)
+                {
+                    file.WriteLine(textBox5.Text);
+                }
+            }
+            using (System.IO.StreamWriter file = new System.IO.StreamWriter("chance.txt", true))
+            {
+                // First Line
+                file.WriteLine(num[0].ToString() + " " + num[1].ToString() + " "+ num[2].ToString() + " "+ num[3].ToString());
+            }
+        }
+
+        private void button4_Click(object sender, EventArgs e)
+        {
+            richTextBox1.Clear();
+            richTextBox1.SelectionFont = new Font("Arial", 16);
+            richTextBox1.SelectionColor = Color.Red;
+            richTextBox1.SelectedText = "5초" + "\n";
+            Thread.Sleep(4000);
+            richTextBox1.SelectionFont = new Font("Arial", 16);
+            richTextBox1.SelectionColor = Color.Red;
+            richTextBox1.SelectedText = "1초" + "\n";
+            Thread.Sleep(1000);
+            richTextBox1.SelectionFont = new Font("Arial", 30);
+
+            ScreenCapture sc = new ScreenCapture();
+            
+            ptr_quiz = sc.CapturePtr();
+            Image img = sc.CaptureWindow(ptr_quiz,5,10,15,20);
+
+            pictureBox2.Image = img;
+            richTextBox1.SelectedText = ptr_quiz.ToString();
+        }
+
+
+        private void Form1_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.KeyData == Keys.F11)
+            {
+                // <19.01.12a
+                this.num[0] = 0;
+                this.num[1] = 0;
+                this.num[2] = 0;
+                this.num[3] = 0;
+                // 19.01.12a>
+                capture_and_search();
+            }
+            else if (e.KeyData == Keys.F12)
+            {
+                // Capture
+                /*
+                Bitmap bitmap = new Bitmap(this.pictureBox1.Width, this.pictureBox1.Height);
+                Graphics graphics = Graphics.FromImage(bitmap);
+                graphics.CopyFromScreen(PointToScreen(new Point(this.pictureBox1.Location.X, this.pictureBox1.Location.Y)), new Point(0, 0), pictureBox1.Size);
+
+                pictureBox2.Image = bitmap;
+                */
             }
         }
 
@@ -98,6 +210,7 @@ namespace WindowsFormsApplication2
             return (byte[])converter.ConvertTo(img, typeof(byte[]));
         }
 
+        /*
         private void hScrollBar1_Scroll(object sender, ScrollEventArgs e)
         {
             pictureBox1.Location = new Point(pic_x + (hScrollBar1.Maximum - hScrollBar1.Value) / 2, pictureBox1.Location.Y);
@@ -109,6 +222,7 @@ namespace WindowsFormsApplication2
             pictureBox1.Location = new Point(pictureBox1.Location.X, pic_y + (vScrollBar1.Maximum - vScrollBar1.Value) / 2);
             pictureBox1.Size = new Size(pictureBox1.Size.Width, vScrollBar1.Value);
         }
+        */
 
         private void init_qna()
         {
@@ -119,6 +233,13 @@ namespace WindowsFormsApplication2
             }
             this.question = "";
             this.answer_cnt = 0;
+        }
+
+        private Image print_picture()
+        {
+            ScreenCapture sc = new ScreenCapture();
+            Image img = sc.CaptureWindow(ptr_quiz, 0, 0, 0, 0);
+            return img;
         }
 
         private string text_change(string String)
@@ -206,24 +327,29 @@ namespace WindowsFormsApplication2
                 textBox7.Text += (max_num + 1).ToString() + ": " + answer[max_num] + " " + (max * 100/total).ToString() + "%";
             }
 
-            for (int i = 0; i < 4; i++)
+
+            if (total != 0)
             {
-                switch (i)
+                for (int i = 0; i < 4; i++)
                 {
-                    case 0:
-                         progressBar1.Value = num[i] *100 / total;
-                        break;
-                    case 1:
-                        progressBar2.Value = num[i] * 100 / total;
-                        break;
-                    case 2:
-                        progressBar3.Value = num[i] * 100 / total;
-                        break;
-                    case 3:
-                        progressBar4.Value = num[i] * 100 / total;
-                        break;
-                    default:
-                        break;
+                    switch (i)
+                    {
+                        case 0:
+                            progressBar1.Value = num[i] * 100 / total;
+                            break;
+                        case 1:
+                            progressBar2.Value = num[i] * 100 / total;
+                            break;
+                        case 2:
+                            progressBar3.Value = num[i] * 100 / total;
+                            break;
+                        case 3:
+                            progressBar4.Value = num[i] * 100 / total;
+                            break;
+                        default:
+                            break;
+
+                    }
                 }
             }
             radioButton1.Checked = false;
@@ -231,23 +357,28 @@ namespace WindowsFormsApplication2
             radioButton3.Checked = false;
             radioButton4.Checked = false;
 
+            textBox2.BackColor = System.Drawing.Color.White;
+            textBox3.BackColor = System.Drawing.Color.White;
+            textBox4.BackColor = System.Drawing.Color.White;
+            textBox5.BackColor = System.Drawing.Color.White;
+
             switch (max_num)
             {
                 case 0:
                     radioButton1.Checked = true;
-                    textBox2.Color = Color.yellow;
+                    textBox2.BackColor = System.Drawing.Color.Yellow;
                     break;
                 case 1:
                     radioButton2.Checked = true;
-                    textBox3.Text = Color.yellow;
+                    textBox3.BackColor = System.Drawing.Color.Yellow;
                     break;
                 case 2:
                     radioButton3.Checked = true;
-                     textBox4.Text = Color.yellow;
+                     textBox4.BackColor = System.Drawing.Color.Yellow;
                     break;
                 case 3:
                     radioButton4.Checked = true;
-                     textBox5.Text = Color.yellow;
+                     textBox5.BackColor = System.Drawing.Color.Yellow;
                     break;
                 default:
                     break;
@@ -660,9 +791,11 @@ namespace WindowsFormsApplication2
 
                 dynamic array = JsonConvert.DeserializeObject(responseText);
 
-                textBox9.Text = array.return_object.WiKiInfo.AnswerInfo.ToString();
+                //textBox9.Text = array.return_object.WiKiInfo.AnswerInfo.ToString();
             }
         }
+
+        
 
         private void capture_and_search()
         {
@@ -675,9 +808,8 @@ namespace WindowsFormsApplication2
             init_qna();
 
             // Capture
-            Bitmap bitmap = new Bitmap(this.pictureBox1.Width, this.pictureBox1.Height);
-            Graphics graphics = Graphics.FromImage(bitmap);
-            graphics.CopyFromScreen(PointToScreen(new Point(this.pictureBox1.Location.X, this.pictureBox1.Location.Y)), new Point(0, 0), pictureBox1.Size);
+            Image capture = print_picture();
+            pictureBox2.Image = capture;
 
             //구글 api 자격증명
             GoogleCredential credential = null;
@@ -701,7 +833,7 @@ namespace WindowsFormsApplication2
             service.HttpClient.Timeout = new TimeSpan(1, 1, 1);
 
             //이미지를 읽어 들입니다.
-            byte[] file = ImageToByte(bitmap);
+            byte[] file = ImageToByte(capture);
 
             // 구글 Image 분석 요청 생성
             BatchAnnotateImagesRequest batchRequest = new BatchAnnotateImagesRequest();
@@ -870,7 +1002,132 @@ namespace WindowsFormsApplication2
             //Wiki_QA(question);
 
             print_answer();
+        }
+    }
 
+    /// <summary>
+    /// Provides functions to capture the entire screen, or a particular window, and save it to a file.
+    /// </summary>
+    public class ScreenCapture
+    {
+        /// <summary>
+        /// Creates an Image object containing a screen shot of the entire desktop
+        /// </summary>
+        /// <returns></returns>
+        
+        public Image CaptureScreen()
+        {
+            return CaptureWindow(User32.GetDesktopWindow(),0,0,0,0);
+        }
+        
+        public IntPtr CapturePtr()
+        {
+            return (User32.GetForegroundWindow());
+        }
+        /// <summary>
+        /// Creates an Image object containing a screen shot of a specific window
+        /// </summary>
+        /// <param name="handle">The handle to the window. (In windows forms, this is obtained by the Handle property)</param>
+        /// <returns></returns>
+        public Image CaptureWindow(IntPtr handle, int left, int right, int top, int bottom)
+        {
+            // get te hDC of the target window
+            IntPtr hdcSrc = User32.GetWindowDC(handle);
+            // get the size
+            User32.RECT windowRect = new User32.RECT();
+            User32.GetWindowRect(handle, ref windowRect);
+
+            int width = (windowRect.right) - (windowRect.left) - left - right;
+            int height = (windowRect.bottom) - (windowRect.top) - bottom - top;
+            // create a device context we can copy to
+            IntPtr hdcDest = GDI32.CreateCompatibleDC(hdcSrc);
+            // create a bitmap we can copy it to,
+            // using GetDeviceCaps to get the width/height
+            IntPtr hBitmap = GDI32.CreateCompatibleBitmap(hdcSrc, width, height);
+            // select the bitmap object
+            IntPtr hOld = GDI32.SelectObject(hdcDest, hBitmap);
+            // bitblt over
+            GDI32.BitBlt(hdcDest, (-1*left), (-1 * top), width-left-right, height-bottom-top, hdcSrc, 0, 0, GDI32.SRCCOPY);
+            // restore selection
+            GDI32.SelectObject(hdcDest, hOld);
+            // clean up 
+            GDI32.DeleteDC(hdcDest);
+            User32.ReleaseDC(handle, hdcSrc);
+            // get a .NET image object for it
+            Image img = Image.FromHbitmap(hBitmap);
+            // free up the Bitmap object
+            GDI32.DeleteObject(hBitmap);
+            return img;
+        }
+        /// <summary>
+        /// Captures a screen shot of a specific window, and saves it to a file
+        /// </summary>
+        /// <param name="handle"></param>
+        /// <param name="filename"></param>
+        /// <param name="format"></param>
+        public void CaptureWindowToFile(IntPtr handle, string filename, ImageFormat format)
+        {
+            Image img = CaptureWindow(handle,0,0,0,0);
+            img.Save(filename, format);
+        }
+        /// <summary>
+        /// Captures a screen shot of the entire desktop, and saves it to a file
+        /// </summary>
+        /// <param name="filename"></param>
+        /// <param name="format"></param>
+        public void CaptureScreenToFile(string filename, ImageFormat format)
+        {
+            Image img = CaptureScreen();
+            img.Save(filename, format);
+        }
+
+        /// <summary>
+        /// Helper class containing Gdi32 API functions
+        /// </summary>
+        private class GDI32
+        {
+
+            public const int SRCCOPY = 0x00CC0020; // BitBlt dwRop parameter
+            [DllImport("gdi32.dll")]
+            public static extern bool BitBlt(IntPtr hObject, int nXDest, int nYDest,
+                int nWidth, int nHeight, IntPtr hObjectSource,
+                int nXSrc, int nYSrc, int dwRop);
+            [DllImport("gdi32.dll")]
+            public static extern IntPtr CreateCompatibleBitmap(IntPtr hDC, int nWidth,
+                int nHeight);
+            [DllImport("gdi32.dll")]
+            public static extern IntPtr CreateCompatibleDC(IntPtr hDC);
+            [DllImport("gdi32.dll")]
+            public static extern bool DeleteDC(IntPtr hDC);
+            [DllImport("gdi32.dll")]
+            public static extern bool DeleteObject(IntPtr hObject);
+            [DllImport("gdi32.dll")]
+            public static extern IntPtr SelectObject(IntPtr hDC, IntPtr hObject);
+        }
+
+        /// <summary>
+        /// Helper class containing User32 API functions
+        /// </summary>
+        private class User32
+        {
+            [StructLayout(LayoutKind.Sequential)]
+            public struct RECT
+            {
+                public int left;
+                public int top;
+                public int right;
+                public int bottom;
+            }
+            [DllImport("user32.dll")]
+            public static extern IntPtr GetDesktopWindow();
+            [DllImport("user32.dll")]
+            public static extern IntPtr GetWindowDC(IntPtr hWnd);
+            [DllImport("user32.dll")]
+            public static extern IntPtr ReleaseDC(IntPtr hWnd, IntPtr hDC);
+            [DllImport("user32.dll")]
+            public static extern IntPtr GetWindowRect(IntPtr hWnd, ref RECT rect);
+            [DllImport("user32")]
+            public static extern IntPtr GetForegroundWindow();
         }
     }
 }

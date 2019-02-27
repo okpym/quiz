@@ -30,7 +30,7 @@ namespace WindowsFormsApplication2
     public partial class Form1 : Form
     {
         int[] num = new int[4]; // 19.01.12a
-        int pic_x, pic_y;
+        int[] num_sample = new int[4];
         string[] answer = new string[4];
         string question;
         string summary;
@@ -43,15 +43,7 @@ namespace WindowsFormsApplication2
         public Form1()
         {
             InitializeComponent();
-            /*
-            hScrollBar1.Minimum = 200;
-            hScrollBar1.Maximum = pictureBox1.Width;
 
-            vScrollBar1.Minimum = 300;
-            vScrollBar1.Maximum = pictureBox1.Height;
-            */
-            //pic_x = pictureBox1.Location.X;
-            //pic_y = pictureBox1.Location.Y;
 
             progressBar1.Minimum = 0;
             progressBar2.Minimum = 0;
@@ -62,32 +54,23 @@ namespace WindowsFormsApplication2
             progressBar2.Maximum = 100;
             progressBar3.Maximum = 100;
             progressBar4.Maximum = 100;
-            
+
             KeyPreview = true;
-            //webBrowser4.Navigate("http://alldic.daum.net/grammar_checker.do"); //다음 맞춤
+
+            textBox9.Text = "6";
+            textBox10.Text = "6";
+            textBox11.Text = "20";
+            textBox12.Text = "30";
         }
-        
+
         private void button1_Click(object sender, EventArgs e)
         {
-            // <19.01.12a
-            this.num[0] = 0;
-            this.num[1] = 0;
-            this.num[2] = 0;
-            this.num[3] = 0;
-            // 19.01.12a>
             capture_and_search();
         }
         private void button2_Click(object sender, EventArgs e)
         {
             // Capture
             print_picture();
-            /*
-            Bitmap bitmap = new Bitmap(this.pictureBox1.Width, this.pictureBox1.Height);
-            Graphics graphics = Graphics.FromImage(bitmap);
-            graphics.CopyFromScreen(PointToScreen(new Point(this.pictureBox1.Location.X, this.pictureBox1.Location.Y)), new Point(0, 0), pictureBox1.Size);
-
-            pictureBox2.Image = bitmap;
-            */
         }
 
         private void button3_Click(object sender, EventArgs e)
@@ -120,15 +103,15 @@ namespace WindowsFormsApplication2
                 {
                     file.WriteLine("1");
                 }
-                else if(radioButton2.Checked == true)
+                else if (radioButton2.Checked == true)
                 {
                     file.WriteLine("2");
                 }
-                else if(radioButton3.Checked == true)
+                else if (radioButton3.Checked == true)
                 {
                     file.WriteLine("3");
                 }
-                else if(radioButton4.Checked == true)
+                else if (radioButton4.Checked == true)
                 {
                     file.WriteLine("4");
                 }
@@ -152,29 +135,24 @@ namespace WindowsFormsApplication2
             using (System.IO.StreamWriter file = new System.IO.StreamWriter("chance.txt", true))
             {
                 // First Line
-                file.WriteLine(num[0].ToString() + " " + num[1].ToString() + " "+ num[2].ToString() + " "+ num[3].ToString());
+                file.WriteLine(num[0].ToString() + " " + num[1].ToString() + " " + num[2].ToString() + " " + num[3].ToString());
             }
         }
 
         private void button4_Click(object sender, EventArgs e)
         {
+
             richTextBox1.Clear();
             richTextBox1.SelectionFont = new Font("Arial", 16);
             richTextBox1.SelectionColor = Color.Red;
-            richTextBox1.SelectedText = "5초" + "\n";
-            Thread.Sleep(4000);
-            richTextBox1.SelectionFont = new Font("Arial", 16);
-            richTextBox1.SelectionColor = Color.Red;
-            richTextBox1.SelectedText = "1초" + "\n";
-            Thread.Sleep(1000);
-            richTextBox1.SelectionFont = new Font("Arial", 30);
+            richTextBox1.SelectedText = "3초" + "\n";
+
+            Thread.Sleep(3000);
 
             ScreenCapture sc = new ScreenCapture();
-            
             ptr_quiz = sc.CapturePtr();
-            Image img = sc.CaptureWindow(ptr_quiz,5,10,15,20);
 
-            pictureBox2.Image = img;
+            pictureBox2.Image = print_picture();
             richTextBox1.SelectedText = ptr_quiz.ToString();
         }
 
@@ -183,24 +161,12 @@ namespace WindowsFormsApplication2
         {
             if (e.KeyData == Keys.F11)
             {
-                // <19.01.12a
-                this.num[0] = 0;
-                this.num[1] = 0;
-                this.num[2] = 0;
-                this.num[3] = 0;
-                // 19.01.12a>
                 capture_and_search();
             }
             else if (e.KeyData == Keys.F12)
             {
                 // Capture
-                /*
-                Bitmap bitmap = new Bitmap(this.pictureBox1.Width, this.pictureBox1.Height);
-                Graphics graphics = Graphics.FromImage(bitmap);
-                graphics.CopyFromScreen(PointToScreen(new Point(this.pictureBox1.Location.X, this.pictureBox1.Location.Y)), new Point(0, 0), pictureBox1.Size);
-
-                pictureBox2.Image = bitmap;
-                */
+                print_picture();
             }
         }
 
@@ -210,26 +176,14 @@ namespace WindowsFormsApplication2
             return (byte[])converter.ConvertTo(img, typeof(byte[]));
         }
 
-        /*
-        private void hScrollBar1_Scroll(object sender, ScrollEventArgs e)
-        {
-            pictureBox1.Location = new Point(pic_x + (hScrollBar1.Maximum - hScrollBar1.Value) / 2, pictureBox1.Location.Y);
-            pictureBox1.Size = new Size(hScrollBar1.Value, pictureBox1.Size.Height);
-        }
-
-        private void vScrollBar1_Scroll(object sender, ScrollEventArgs e)
-        {
-            pictureBox1.Location = new Point(pictureBox1.Location.X, pic_y + (vScrollBar1.Maximum - vScrollBar1.Value) / 2);
-            pictureBox1.Size = new Size(pictureBox1.Size.Width, vScrollBar1.Value);
-        }
-        */
-
         private void init_qna()
         {
             for (int i = 0; i < 4; i++)
             {
                 this.answer[i] = "";
                 this.number[i] = 0;
+                this.num[i] = 0;
+                this.num_sample[i] = 0;
             }
             this.question = "";
             this.answer_cnt = 0;
@@ -238,7 +192,7 @@ namespace WindowsFormsApplication2
         private Image print_picture()
         {
             ScreenCapture sc = new ScreenCapture();
-            Image img = sc.CaptureWindow(ptr_quiz, 0, 0, 0, 0);
+            Image img = sc.CaptureWindow(ptr_quiz, Int32.Parse(textBox9.Text), Int32.Parse(textBox10.Text), Int32.Parse(textBox11.Text), Int32.Parse(textBox12.Text));
             return img;
         }
 
@@ -250,7 +204,7 @@ namespace WindowsFormsApplication2
             string[] lines1 = System.IO.File.ReadAllLines("erase.txt", Encoding.Default);
             foreach (string line in lines1)
             {
-                //String = String.Replace(line, "");
+                String = String.Replace(line, "");
             }
 
             // 반전
@@ -267,8 +221,8 @@ namespace WindowsFormsApplication2
                     //textBox1.BackColor = System.Drawing.Color.White;
                 }
             }
-            //String = String.Replace("  ", " ");
-            //String = String.Replace("  ", " ");
+            String = String.Replace("  ", " ");
+            String = String.Replace("  ", " ");
             return String;
         }
 
@@ -286,37 +240,29 @@ namespace WindowsFormsApplication2
         {
             if (e.Url.AbsoluteUri == webBrowser1.Url.AbsoluteUri)
             {
-                high_light(1,1);
+                high_light(1, 1);
                 print_answer();
             }
         }
-        private void webBrowser2_DocumentCompleted(object sender, WebBrowserDocumentCompletedEventArgs e)
-        {
-            if (e.Url.AbsoluteUri == webBrowser2.Url.AbsoluteUri)
-            {
-                high_light(2,1);
-                print_answer();
-            }
 
-        }
         private void webBrowser3_DocumentCompleted(object sender, WebBrowserDocumentCompletedEventArgs e)
         {
             if (e.Url.AbsoluteUri == webBrowser3.Url.AbsoluteUri)
             {
-                high_light(3,1);
+                high_light(3, 1);
                 print_answer();
             }
         }
 
         private void print_answer()
         {
-            int max = 1;
+            int max = 0;
             int max_num = 5;
             int total = num[0] + num[1] + num[2] + num[3];
-            textBox7.Text = this.num[0].ToString() + " " + this.num[1].ToString() + " " + this.num[2].ToString() + " " + this.num[3].ToString()+ "\r\n";
-            for(int i=0;i<4;i++)
+            textBox7.Text = this.num[0].ToString() + " " + this.num[1].ToString() + " " + this.num[2].ToString() + " " + this.num[3].ToString() + "\r\n";
+            for (int i = 0; i < 4; i++)
             {
-                if(max < num[i])
+                if (max < num[i])
                 {
                     max = num[i];
                     max_num = i;
@@ -324,7 +270,7 @@ namespace WindowsFormsApplication2
             }
             if (max_num != 5 && max > 2)
             {
-                textBox7.Text += (max_num + 1).ToString() + ": " + answer[max_num] + " " + (max * 100/total).ToString() + "%";
+                textBox7.Text += (max_num + 1).ToString() + ": " + answer[max_num] + " " + (max * 100 / total).ToString() + "%";
             }
 
 
@@ -357,32 +303,60 @@ namespace WindowsFormsApplication2
             radioButton3.Checked = false;
             radioButton4.Checked = false;
 
-            textBox2.BackColor = System.Drawing.Color.White;
-            textBox3.BackColor = System.Drawing.Color.White;
-            textBox4.BackColor = System.Drawing.Color.White;
-            textBox5.BackColor = System.Drawing.Color.White;
+            textBox2.BackColor = Color.White;
+            textBox3.BackColor = Color.White;
+            textBox4.BackColor = Color.White;
+            textBox5.BackColor = Color.White;
 
             switch (max_num)
             {
                 case 0:
                     radioButton1.Checked = true;
-                    textBox2.BackColor = System.Drawing.Color.Yellow;
+                    textBox2.BackColor = color_of_question(num[0], num[0] + num[1] + num[2] + num[3]);
                     break;
                 case 1:
                     radioButton2.Checked = true;
-                    textBox3.BackColor = System.Drawing.Color.Yellow;
+                    textBox3.BackColor = color_of_question(num[1], num[0] + num[1] + num[2] + num[3]);
                     break;
                 case 2:
                     radioButton3.Checked = true;
-                     textBox4.BackColor = System.Drawing.Color.Yellow;
+                    textBox4.BackColor = color_of_question(num[2], num[0] + num[1] + num[2] + num[3]);
                     break;
                 case 3:
                     radioButton4.Checked = true;
-                     textBox5.BackColor = System.Drawing.Color.Yellow;
+                    textBox5.BackColor = color_of_question(num[3], num[0] + num[1] + num[2] + num[3]);
                     break;
                 default:
                     break;
             }
+        }
+
+        private Color color_of_question(int num, int total)
+        {
+            int percentage = num * 100 / total;
+            if (total >= 5 && percentage >= 99 ||
+               total >= 10 && percentage >= 97 ||
+               total >= 25 && percentage >= 95 ||
+               total >= 100 && percentage >= 90 ||
+               total >= 1000 && percentage >= 85 ||
+               total >= 5000 && percentage >= 75)
+            {
+                return Color.LightGreen;
+            }
+            else if (total >= 5 && percentage >= 70 ||
+                    total >= 10 && percentage >= 70 ||
+                    total >= 25 && percentage >= 70 ||
+                    total >= 100 && percentage >= 50 ||
+                    total >= 1000 && percentage >= 50 ||
+                    total >= 5000 && percentage >= 50)
+            {
+                return Color.Yellow;
+            }
+            else
+            {
+                return Color.Salmon;
+            }
+
         }
 
         public int WordCheck(string String, string Word)
@@ -393,7 +367,7 @@ namespace WindowsFormsApplication2
         }
 
 
-        private void high_light(int num,int mul)
+        private void high_light(int num, int mul)
         {
             int[] count = new int[4];
 
@@ -402,15 +376,11 @@ namespace WindowsFormsApplication2
             {
                 doc2 = (mshtml.IHTMLDocument2)webBrowser1.Document.DomDocument;
             }
-            else if (num == 2)
-            {
-                doc2 = (mshtml.IHTMLDocument2)webBrowser2.Document.DomDocument;
-            }
             else
             {
                 doc2 = (mshtml.IHTMLDocument2)webBrowser3.Document.DomDocument;
             }
-           
+
             string[] ReplacementTag = new string[5];
 
 
@@ -465,7 +435,7 @@ namespace WindowsFormsApplication2
                         if (i < 4)
                         {
                             count[i] += 1;
-                            this.num[i] += mul; 
+                            this.num[i] += mul;
                         }
                         // 19.01.12a>
                     }
@@ -478,11 +448,11 @@ namespace WindowsFormsApplication2
             textBox8.Text += "  " + stopwatch.Elapsed.ToString();
             textBox8.Text += ":  " + count[0].ToString() + " " + count[1].ToString() + " " + count[2].ToString() + " " + count[3].ToString() + "  ";
 
-            if (num ==1)
+            if (num == 1)
             {
                 textBox8.Text += "구글";
             }
-            else if(num == 2)
+            else if (num == 2)
             {
                 textBox8.Text += "다음";
             }
@@ -565,41 +535,20 @@ namespace WindowsFormsApplication2
             }
         }
 
-        private void Naver_Api(string query,string type, int mul, string name)
+        private void Naver_Api(string query, string type, int mul, string name)
         {
             int[] count = new int[4];
 
             string display = "100";   // display 10~100까지 읽음
             string sort = "sim";     // sort sim(유사도순) date(날짜순)
 
-            string url = "https://openapi.naver.com/v1/search/" + type +"?query=" + query + "&display=" + display + "&sort=" + sort; // 결과가 JSON 포맷
+            string url = "https://openapi.naver.com/v1/search/" + type + "?query=" + query + "&display=" + display + "&sort=" + sort; // 결과가 JSON 포맷
 
             HttpWebRequest request = (HttpWebRequest)WebRequest.Create(url);
 
             string c_id = "1kwVZ3_v8s26Ix9WWfhN";
             string c_pw = "cNqeOh_NJX";
-            /*
-            switch (count_request % 4)
-            {
-                case 0:
-                    c_id = "1kwVZ3_v8s26Ix9WWfhN";
-                    c_pw = "cNqeOh_NJX";
-                    break;
-                case 1:
-                    c_id = "4Py3I37chC6dKkjYDW3t";
-                    c_pw = "WDoxEs6YEx";
-                    break;
-                case 2:
-                    c_id = "7uwRBqcbUvEjR8a3oLwO";
-                    c_pw = "teW9tgMoQZ";
-                    break;
-                case 3:
-                default:
-                    c_id = "xgZhUGM11pTpdTIioQrD";
-                    c_pw = "gwdhc7Clq0";
-                    break;
-            }
-            */
+
             request.Headers.Add("X-Naver-Client-Id", c_id); // 클라이언트 아이디
             request.Headers.Add("X-Naver-Client-Secret", c_pw);       // 클라이언트 시크릿
 
@@ -620,7 +569,7 @@ namespace WindowsFormsApplication2
 
                     int total = array.display;
 
-                    for(int j = 0; j <total;j++)
+                    for (int j = 0; j < total; j++)
                     {
                         List<string> SearchWords = new List<string>();
 
@@ -647,7 +596,100 @@ namespace WindowsFormsApplication2
                                 }
                             }
                             SearchWords.Clear();
-                        }                     
+                        }
+                    }
+                }
+                else
+                {
+                    Console.WriteLine("Error 발생=" + status);
+                }
+            }
+            catch (WebException e)
+            {
+            }
+            if (mul != 0)
+            {
+                textBox8.Text += "  " + stopwatch.Elapsed.ToString();
+                textBox8.Text += ":  " + count[0].ToString() + " " + count[1].ToString() + " " + count[2].ToString() + " " + count[3].ToString() + " " + name + "\r\n";
+            }
+            else
+            {
+                for (int i = 0; i < 4; i++)
+                {
+                    num_sample[i] += count[i];
+                }
+            }
+        }
+
+        private void Daum_Api(string query, string type, int mul, string name)
+        {
+            int[] count = new int[4];
+
+            string page = "1";   // page 1~50까지 읽음
+            string sort = "accuracy";     // sort accuracy(유사도순) recency(날짜순)
+            string size = "50";     // 한 페이지에 보여질 문서의 개수 1~50
+
+            string url = "https://dapi.kakao.com/v2/search/" + type + "?query=" + query + "&page=" + page + "&sort=" + sort+ "&size=" + size; // 결과가 JSON 포맷
+
+            HttpWebRequest request = (HttpWebRequest)WebRequest.Create(url);
+
+            string authorization = "be52e80cc2fdea561e24ef49c56847a7";
+
+            request.Headers.Add("Authorization", "KakaoAK "+ authorization);       // 클라이언트 시크릿
+
+            // 요청, 응답 받기
+            try
+            {
+                HttpWebResponse response = (HttpWebResponse)request.GetResponse();
+                string status = response.StatusCode.ToString();
+                if (status == "OK")
+                {
+                    // 응답 Stream 읽기
+                    Stream stream = response.GetResponseStream();
+                    StreamReader reader = new StreamReader(stream, Encoding.UTF8);
+
+                    // 응답 Stream -> 응답 String 변환
+                    string text = reader.ReadToEnd();
+                    dynamic array = JsonConvert.DeserializeObject(text);
+
+                    int total;
+                    if(array.meta.pageable_count > 50)
+                    {
+                        total = 50;     
+                    }
+                    else
+                    {
+                        total = array.meta.pageable_count;
+                    }                
+
+                    for (int j = 0; j < total; j++)
+                    {
+                        List<string> SearchWords = new List<string>();
+
+                        for (int i = 0; i < 4; i++)
+                        {
+                            if (answer[i] != null)
+                            {
+                                string[] split = answer[i].Split(' ');
+                                foreach (string item in split)
+                                {
+                                    if (item.Count() > 1)
+                                    {
+                                        SearchWords.Add(item);
+                                    }
+                                }
+                            }
+                            foreach (string item in SearchWords)
+                            {
+                                string title = array.documents[j].ToString();
+                                if (WordCheck(title, item) > 0)
+                                {
+                                    count[i] += WordCheck(title, item);
+                                    this.num[i] += mul * count[i];
+                                }
+                            }
+                            SearchWords.Clear();
+                        }
                     }
                 }
                 else
@@ -809,6 +851,7 @@ namespace WindowsFormsApplication2
 
             // Capture
             Image capture = print_picture();
+
             pictureBox2.Image = capture;
 
             //구글 api 자격증명
@@ -979,26 +1022,33 @@ namespace WindowsFormsApplication2
             //string url6 = "http://alldic.daum.net/grammar_checker.do"; // 다음 맞춤법 
             string url7 = "https://search.daum.net/search?w=tot&DA=YZR&t__nil_searchbox=btn&sug=&sugo=&q=" + utf8String; // 다음 검색
             
-            Naver_Api(question, "blog", 1, "API 블로그");
-            Naver_Api(question, "news", 1, "API 뉴스");
-            Naver_Api(question, "encyc", 1, "API 백과사전");
-           // Naver_Api(question, "webkr", 1, "API 웹문서");
-           // Naver_Api(question, "doc", 1, "API 전문자료");
-           
-            Naver_Api(summary, "blog", 1, "API summary");
-            //Naver_Api(summary2, "blog", 1, "API summary2");
+            Naver_Api(question, "blog", 1, "Naver 블로그");
+            Naver_Api(question, "news", 1, "Naver 뉴스");
+            Naver_Api(question, "encyc", 1, "Naver 백과사전");
+            // Naver_Api(question, "webkr", 1, "Naver 웹문서");
+            // Naver_Api(question, "doc", 1, "Naver 전문자료");
 
-            foreach(string str in answer)
-            {
-                Naver_Api(str + " " + summary, "blog", 0, "API 문제포함");
-            }
-           
+            Naver_Api(summary, "blog", 1, "Naver summary");
+            //Naver_Api(summary2, "blog", 1, "Naver summary2");
+
+            Daum_Api(question, "blog", 1, "Daum 블로그");
+            Daum_Api(question, "web", 1, "Daum web 문서");
+            Daum_Api(summary, "blog", 1, "Daum summary");
+
             // Internet Browser
             webBrowser1.Navigate(url2_1); //Google + 문 // +5 
             //webBrowser2.Navigate(url7); // 다음검색
             //webBrowser3.Navigate(url2); //Google + 문답
             webBrowser3.Navigate(url2_2); //Google + 문 요약
                                           //webBrowser4.Navigate(url5);
+
+            if ((num[0] + num[1] + num[2] + num[3]) < 5)
+            {
+                foreach (string str in answer)
+                {
+                    Naver_Api(str + " " + summary, "blog", 1, "Naver 답 포함");
+                }
+            }
             //Wiki_QA(question);
 
             print_answer();
@@ -1029,13 +1079,21 @@ namespace WindowsFormsApplication2
         /// </summary>
         /// <param name="handle">The handle to the window. (In windows forms, this is obtained by the Handle property)</param>
         /// <returns></returns>
-        public Image CaptureWindow(IntPtr handle, int left, int right, int top, int bottom)
+        public Image CaptureWindow(IntPtr handle, int left_p, int right_p, int top_p, int bottom_p)
         {
+            int left, right, top, bottom;
+            
+
             // get te hDC of the target window
             IntPtr hdcSrc = User32.GetWindowDC(handle);
             // get the size
             User32.RECT windowRect = new User32.RECT();
             User32.GetWindowRect(handle, ref windowRect);
+
+            left = (windowRect.right - windowRect.left) * left_p / 100;
+            right =(windowRect.right - windowRect.left) * right_p / 100;
+            top = (windowRect.bottom - windowRect.top) * top_p / 100;
+            bottom = (windowRect.bottom - windowRect.top) * bottom_p / 100;
 
             int width = (windowRect.right) - (windowRect.left) - left - right;
             int height = (windowRect.bottom) - (windowRect.top) - bottom - top;
@@ -1047,7 +1105,7 @@ namespace WindowsFormsApplication2
             // select the bitmap object
             IntPtr hOld = GDI32.SelectObject(hdcDest, hBitmap);
             // bitblt over
-            GDI32.BitBlt(hdcDest, (-1*left), (-1 * top), width-left-right, height-bottom-top, hdcSrc, 0, 0, GDI32.SRCCOPY);
+            GDI32.BitBlt(hdcDest, 0, 0, width, height, hdcSrc, left, top, GDI32.SRCCOPY);
             // restore selection
             GDI32.SelectObject(hdcDest, hOld);
             // clean up 

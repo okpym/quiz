@@ -1,12 +1,10 @@
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
 using System.Drawing;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.Threading;
 using System.IO;
 
 using Google.Apis.Auth.OAuth2;
@@ -21,9 +19,10 @@ using Newtonsoft.Json;
 
 using System.Runtime.InteropServices;
 using System.Drawing.Imaging;
+
 using Image = System.Drawing.Image;
-using System.Threading;
 using Color = System.Drawing.Color;
+using System.Text.RegularExpressions;
 
 namespace WindowsFormsApplication2
 {
@@ -35,25 +34,19 @@ namespace WindowsFormsApplication2
         string question;
         string summary;
         string summary2;
+        int max = 0;
+        int max_backup = 0;
         int[] number = new int[4];
         int answer_cnt;
+        int counter_timer1;
+        int counter_timer2;
         Stopwatch stopwatch = new Stopwatch();
         IntPtr ptr_quiz;
 
         public Form1()
         {
             InitializeComponent();
-
-
-            progressBar1.Minimum = 0;
-            progressBar2.Minimum = 0;
-            progressBar3.Minimum = 0;
-            progressBar4.Minimum = 0;
-
-            progressBar1.Maximum = 100;
-            progressBar2.Maximum = 100;
-            progressBar3.Maximum = 100;
-            progressBar4.Maximum = 100;
+            InitializeTimer();
 
             KeyPreview = true;
 
@@ -61,6 +54,18 @@ namespace WindowsFormsApplication2
             textBox10.Text = "6";
             textBox11.Text = "20";
             textBox12.Text = "30";
+
+            progressBar1.Minimum = 0;
+            progressBar2.Minimum = 0;
+            progressBar3.Minimum = 0;
+            progressBar4.Minimum = 0;
+            progressBar5.Minimum = 0;
+
+            progressBar1.Maximum = 100;
+            progressBar2.Maximum = 100;
+            progressBar3.Maximum = 100;
+            progressBar4.Maximum = 100;
+            progressBar5.Maximum = 100;
         }
 
         private void button1_Click(object sender, EventArgs e)
@@ -156,6 +161,20 @@ namespace WindowsFormsApplication2
             richTextBox1.SelectedText = ptr_quiz.ToString();
         }
 
+        private void button5_Click(object sender, EventArgs e)
+        {
+            if(timer1.Enabled == false)
+            {
+                timer1.Enabled = true;
+                button5.Text = "Start";
+            }
+            else
+            {
+                timer1.Enabled = false;
+                button5.Text = "Stop";
+            }
+        }
+
 
         private void Form1_KeyDown(object sender, KeyEventArgs e)
         {
@@ -167,6 +186,81 @@ namespace WindowsFormsApplication2
             {
                 // Capture
                 print_picture();
+            }
+        }
+
+        private void InitializeTimer()
+        {
+            counter_timer1 = 0;
+            counter_timer2 = 0;
+            timer1.Interval = 100;
+            //timer1.Enabled = true;
+            // Hook up timer's tick event handler.  
+            this.timer1.Tick += new System.EventHandler(this.timer1_Tick);
+
+        }
+
+        private void timer1_Tick(object sender, System.EventArgs e)
+        {
+
+            // Exit loop code.  
+            //timer1.Enabled = false;
+            //richTextBox1.Text += "1";
+
+            ScreenCapture sc = new ScreenCapture();
+            Image img = sc.CaptureWindow(ptr_quiz, Int32.Parse(textBox9.Text), Int32.Parse(textBox10.Text), Int32.Parse(textBox11.Text), Int32.Parse(textBox12.Text));
+
+            Bitmap bmp = new Bitmap(img);
+            
+            Color clr = bmp.GetPixel(5, 5); // Get the color of pixel at position 5,5
+            int red = clr.R;
+            int green = clr.G;
+            int blue = clr.B;
+
+            Color clr2 = bmp.GetPixel(5, bmp.Height/3); // Get the color of pixel at position 5,5
+            int red2= clr2.R;
+            int green2 = clr2.G;
+            int blue2 = clr2.B;
+
+            Color clr3 = bmp.GetPixel(bmp.Width - 5, bmp.Height/3); // Get the color of pixel at position 5,5
+            int red3 = clr3.R;
+            int green3 = clr3.G;
+            int blue3 = clr3.B;
+
+            bmp.SetPixel(5, 5, Color.Black);
+            bmp.SetPixel(5, bmp.Height/3, Color.Black);
+            bmp.SetPixel(bmp.Width - 5, bmp.Height / 3, Color.Black);
+            
+
+            pictureBox2.Image = bmp;
+
+
+            //Color pixel = sc.GetPixelColor(ptr_quiz, 100, 100);
+
+            if (clr.Name == "ffffffff" && clr2.Name == "ffffffff" && clr3.Name == "ffffffff" && counter_timer1 == 0)
+            {
+                if (counter_timer2 < 3)
+                {
+                    counter_timer2++;
+                }
+                else
+                {
+                    richTextBox1.Text = "Question";
+                    counter_timer1 = 100;
+                    counter_timer2 = 0;
+
+                    capture_and_search();
+                }
+            }
+            else
+            {
+                if (counter_timer1 > 0)
+                {
+                    counter_timer1--;
+                    progressBar5.Value = counter_timer1;
+                    richTextBox1.Text += "-";
+                }
+                counter_timer2 = 0;
             }
         }
 
@@ -187,6 +281,15 @@ namespace WindowsFormsApplication2
             }
             this.question = "";
             this.answer_cnt = 0;
+            this.max = 0;
+            this.max_backup = 0;
+
+            progressBar1.Value = 0;
+            progressBar2.Value = 0;
+            progressBar3.Value = 0;
+            progressBar4.Value = 0;
+
+            richTextBox1.Clear();
         }
 
         private Image print_picture()
@@ -400,7 +503,10 @@ namespace WindowsFormsApplication2
                 // Question
                 if (i == 4)
                 {
-                    string[] split = question.Split(' ');
+                    string str = Regex.Replace(question, @"\p{Lu}", "");
+                    str = Regex.Replace(str, @"\p{Ll}", "");
+
+                    string[] split = str.Split(' ');
                     foreach (string item in split)
                     {
                         if (item.Count() > 1)
@@ -535,9 +641,22 @@ namespace WindowsFormsApplication2
             }
         }
 
+        private string Change_RichText(string str)
+        {
+
+            string change = str;
+            //change = change.Replace(@"<b>",@"\b ");
+            //change = change.Replace(@"</b>", @"\b0");
+
+            change = change.Replace(@"<b>",@"<<");
+            change = change.Replace(@"</b>", @">>");
+            return change;
+        }
+
         private void Naver_Api(string query, string type, int mul, string name)
         {
             int[] count = new int[4];
+            string max_string = "";
 
             string display = "100";   // display 10~100까지 읽음
             string sort = "sim";     // sort sim(유사도순) date(날짜순)
@@ -572,6 +691,7 @@ namespace WindowsFormsApplication2
                     for (int j = 0; j < total; j++)
                     {
                         List<string> SearchWords = new List<string>();
+                        List<string> QuestionWords = new List<string>();
 
                         for (int i = 0; i < 4; i++)
                         {
@@ -580,20 +700,40 @@ namespace WindowsFormsApplication2
                                 string[] split = answer[i].Split(' ');
                                 foreach (string item in split)
                                 {
-                                    if (item.Count() > 1)
+                                    if (item.Count() > 1) // 2글자 이상
                                     {
                                         SearchWords.Add(item);
                                     }
                                 }
                             }
+                            string title = array.items[j].ToString();
                             foreach (string item in SearchWords)
                             {
-                                string title = array.items[j].ToString();
+                              
                                 if (WordCheck(title, item) > 0)
                                 {
                                     count[i] += WordCheck(title, item);
-                                    this.num[i] += mul * count[i];
                                 }
+                            }
+                            //// 19.03.03 New                
+                            int cnt = 0;
+                            string description = array.items[j].description.ToString();
+                            string[] split2 = summary2.Split(' ');
+                            foreach (string item in split2)
+                            {
+                                SearchWords.Add(item);
+                            }
+                            foreach (string item in SearchWords)
+                            {
+                                if (WordCheck(description, item) > 0)
+                                {
+                                    cnt++;
+                                }
+                            }
+                            if (cnt > max)
+                            {
+                                max = cnt;
+                                max_string = description;
                             }
                             SearchWords.Clear();
                         }
@@ -611,6 +751,25 @@ namespace WindowsFormsApplication2
             {
                 textBox8.Text += "  " + stopwatch.Elapsed.ToString();
                 textBox8.Text += ":  " + count[0].ToString() + " " + count[1].ToString() + " " + count[2].ToString() + " " + count[3].ToString() + " " + name + "\r\n";
+
+                for(int i = 0; i<4;i++)
+                    num[i] += count[i];
+
+
+                max_string = Change_RichText(max_string);
+                if (max_backup < max)
+                {
+                    richTextBox1.Clear();
+                    //richTextBox1.Rtf = max_string.ToString();
+                    richTextBox1.SelectedText = max + ":" + max_string + "\r\n" + "\r\n";
+                    max_backup = max;
+
+                }
+                else if(max_backup == max)
+                {
+                    richTextBox1.SelectedText += max + ":" + max_string + "\r\n" + "\r\n";
+                }
+                max = 0;
             }
             else
             {
@@ -624,6 +783,7 @@ namespace WindowsFormsApplication2
         private void Daum_Api(string query, string type, int mul, string name)
         {
             int[] count = new int[4];
+            string max_string = "";
 
             string page = "1";   // page 1~50까지 읽음
             string sort = "accuracy";     // sort accuracy(유사도순) recency(날짜순)
@@ -685,8 +845,29 @@ namespace WindowsFormsApplication2
                                 if (WordCheck(title, item) > 0)
                                 {
                                     count[i] += WordCheck(title, item);
-                                    this.num[i] += mul * count[i];
+                                    
                                 }
+                            }
+
+                            //// 19.03.03 New                
+                            int cnt = 0;
+                            string description = array.documents[j].contents.ToString();
+                            string[] split2 = summary2.Split(' ');
+                            foreach (string item in split2)
+                            {
+                                SearchWords.Add(item);
+                            }
+                            foreach (string item in SearchWords)
+                            {
+                                if (WordCheck(description, item) > 0)
+                                {
+                                    cnt++;
+                                }
+                            }
+                            if (cnt > max)
+                            {
+                                max = cnt;
+                                max_string = description;
                             }
                             SearchWords.Clear();
                         }
@@ -702,21 +883,44 @@ namespace WindowsFormsApplication2
             }
             textBox8.Text += "  " + stopwatch.Elapsed.ToString();
             textBox8.Text += ":  " + count[0].ToString() + " " + count[1].ToString() + " " + count[2].ToString() + " " + count[3].ToString() + " " + name + "\r\n";
+
+            for (int i = 0; i < 4; i++)
+                num[i] += count[i];
+
+            max_string = Change_RichText(max_string);
+            if (max_backup < max)
+            {
+                richTextBox1.Clear();
+
+               richTextBox1.SelectedText = max + ":" + max_string + "\r\n" + "\r\n";
+                max_backup = max;
+            }
+            else if (max_backup == max)
+            {
+                richTextBox1.SelectedText += max + ":" + max_string + "\r\n" + "\r\n";
+
+            }
+            max = 0;
         }
 
-        private void textBox7_KeyDown(object sender, KeyEventArgs e)
-        {
-            if(e.KeyData == Keys.Enter)
-            {
-                capture_and_search();
-            }
+        static string CleanInput(string strIn)
+        {         
+            string str = Regex.Replace(strIn, @"\p{P}", "");
+            str = Regex.Replace(str, @"\p{S}", "");
+            str = str.Replace("  ", " ");
+            str = str.Trim();
+
+            return str;
         }
+
         private void summary_qna()
         {
             // 필요없는 문구 없애기
             question = text_change(question);
 
             // 공간 없애기
+            question = CleanInput(question);
+            /*
             question = question.Replace("\n", " ");
             question = question.Replace("?", "");
             question = question.Replace("|", "");
@@ -726,22 +930,19 @@ namespace WindowsFormsApplication2
             question = question.Replace("]", "");
             question = question.Replace("!", "");
             question = question.Replace("\"", "");
-            question = question.Replace("<", "");
-            question = question.Replace(">", "");
-            question = question.Replace("/", "");
 
+            question = question.Replace("/", "");
+            
             question = question.Replace("  ", " ");
             question = question.Trim(); // 선후행 공백 제거
-
+            */
+            
             for (int i = 0; i < 4; i++)
             {
                 if (answer[i] != null)
                 {
-                    answer[i] = answer[i].Replace("|", "");
-                    answer[i] = answer[i].Replace(" . ", "");
-                    answer[i] = answer[i].Replace(" .", "");
-                    answer[i] = answer[i].Replace("  ", " ");
-                    answer[i] = answer[i].Trim();
+                    answer[i] = CleanInput(answer[i]);
+                    
                 }
             }
             // 중복된 문구 없애기
@@ -1025,6 +1226,7 @@ namespace WindowsFormsApplication2
             Naver_Api(question, "blog", 1, "Naver 블로그");
             Naver_Api(question, "news", 1, "Naver 뉴스");
             Naver_Api(question, "encyc", 1, "Naver 백과사전");
+            
             // Naver_Api(question, "webkr", 1, "Naver 웹문서");
             // Naver_Api(question, "doc", 1, "Naver 전문자료");
 
@@ -1139,6 +1341,17 @@ namespace WindowsFormsApplication2
             img.Save(filename, format);
         }
 
+        public Color GetPixelColor(IntPtr hwnd, int x, int y)
+        {
+            IntPtr hdc = User32.GetDC(hwnd);
+            uint pixel = GDI32.GetPixel(hdc, x, y);
+            User32.ReleaseDC(hwnd, hdc);
+            Color color = Color.FromArgb((int)(pixel & 0x000000FF),
+                            (int)(pixel & 0x0000FF00) >> 8,
+                            (int)(pixel & 0x00FF0000) >> 16);
+            return color;
+        }
+
         /// <summary>
         /// Helper class containing Gdi32 API functions
         /// </summary>
@@ -1161,6 +1374,9 @@ namespace WindowsFormsApplication2
             public static extern bool DeleteObject(IntPtr hObject);
             [DllImport("gdi32.dll")]
             public static extern IntPtr SelectObject(IntPtr hDC, IntPtr hObject);
+            [DllImport("gdi32.dll")]
+            public static extern uint GetPixel(IntPtr hdc, int nXPos, int nYPos);
+
         }
 
         /// <summary>
@@ -1186,6 +1402,9 @@ namespace WindowsFormsApplication2
             public static extern IntPtr GetWindowRect(IntPtr hWnd, ref RECT rect);
             [DllImport("user32")]
             public static extern IntPtr GetForegroundWindow();
+            [DllImport("user32.dll")]
+            public static extern IntPtr GetDC(IntPtr hwnd);
+
         }
     }
 }

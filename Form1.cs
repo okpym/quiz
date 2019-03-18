@@ -32,8 +32,9 @@ namespace WindowsFormsApplication2
         int[] num_sample = new int[4];
         string[] answer = new string[4];
         string question;
-        string summary;
-        string summary2;
+        //string summary;
+        //string summary2;
+        string summary3;
         int max = 0;
         int max_backup = 0;
         int[] number = new int[4];
@@ -54,18 +55,6 @@ namespace WindowsFormsApplication2
             textBox10.Text = "6";
             textBox11.Text = "20";
             textBox12.Text = "30";
-
-            progressBar1.Minimum = 0;
-            progressBar2.Minimum = 0;
-            progressBar3.Minimum = 0;
-            progressBar4.Minimum = 0;
-            progressBar5.Minimum = 0;
-
-            progressBar1.Maximum = 100;
-            progressBar2.Maximum = 100;
-            progressBar3.Maximum = 100;
-            progressBar4.Maximum = 100;
-            progressBar5.Maximum = 100;
         }
 
         private void button1_Click(object sender, EventArgs e)
@@ -284,10 +273,34 @@ namespace WindowsFormsApplication2
             this.max = 0;
             this.max_backup = 0;
 
+            progressBar1.Minimum = 0;
+            progressBar2.Minimum = 0;
+            progressBar3.Minimum = 0;
+            progressBar4.Minimum = 0;
+            progressBar5.Minimum = 0;
+
+            progressBar1.Maximum = 100;
+            progressBar2.Maximum = 100;
+            progressBar3.Maximum = 100;
+            progressBar4.Maximum = 100;
+            progressBar5.Maximum = 100;
+
             progressBar1.Value = 0;
             progressBar2.Value = 0;
             progressBar3.Value = 0;
             progressBar4.Value = 0;
+
+            textBox2.BackColor = Color.White;
+            textBox3.BackColor = Color.White;
+            textBox4.BackColor = Color.White;
+            textBox5.BackColor = Color.White;
+
+            radioButton1.Checked = false;
+            radioButton2.Checked = false;
+            radioButton3.Checked = false;
+            radioButton4.Checked = false;
+
+
 
             richTextBox1.Clear();
         }
@@ -343,7 +356,7 @@ namespace WindowsFormsApplication2
         {
             if (e.Url.AbsoluteUri == webBrowser1.Url.AbsoluteUri)
             {
-                high_light(1, 1);
+                //high_light(1, 1);
                 print_answer();
             }
         }
@@ -352,7 +365,7 @@ namespace WindowsFormsApplication2
         {
             if (e.Url.AbsoluteUri == webBrowser3.Url.AbsoluteUri)
             {
-                high_light(3, 1);
+                //high_light(3, 1);
                 print_answer();
             }
         }
@@ -376,7 +389,7 @@ namespace WindowsFormsApplication2
                 textBox7.Text += (max_num + 1).ToString() + ": " + answer[max_num] + " " + (max * 100 / total).ToString() + "%";
             }
 
-
+            // Progress Bar
             if (total != 0)
             {
                 for (int i = 0; i < 4; i++)
@@ -401,15 +414,6 @@ namespace WindowsFormsApplication2
                     }
                 }
             }
-            radioButton1.Checked = false;
-            radioButton2.Checked = false;
-            radioButton3.Checked = false;
-            radioButton4.Checked = false;
-
-            textBox2.BackColor = Color.White;
-            textBox3.BackColor = Color.White;
-            textBox4.BackColor = Color.White;
-            textBox5.BackColor = Color.White;
 
             switch (max_num)
             {
@@ -469,7 +473,7 @@ namespace WindowsFormsApplication2
             return StringArray.Length - 1;
         }
 
-
+        /*
         private void high_light(int num, int mul)
         {
             int[] count = new int[4];
@@ -558,16 +562,13 @@ namespace WindowsFormsApplication2
             {
                 textBox8.Text += "구글";
             }
-            else if (num == 2)
-            {
-                textBox8.Text += "다음";
-            }
             else if (num == 3)
             {
                 textBox8.Text += "구글요약";
             }
             textBox8.Text += "\r\n";
         }
+        */
 
         private void search_word(string url, int mul, string name)
         {
@@ -641,16 +642,64 @@ namespace WindowsFormsApplication2
             }
         }
 
-        private string Change_RichText(string str)
+        private void Change_RichText()
         {
+            string change = richTextBox1.Text;
 
-            string change = str;
-            //change = change.Replace(@"<b>",@"\b ");
-            //change = change.Replace(@"</b>", @"\b0");
+            richTextBox1.Text = richTextBox1.Text.Replace(@"<b>", @"<<");
+            richTextBox1.Text = richTextBox1.Text.Replace(@"</b>", @">>");
 
-            change = change.Replace(@"<b>",@"<<");
-            change = change.Replace(@"</b>", @">>");
-            return change;
+            Font newFont = new Font(
+                richTextBox1.Font.FontFamily,
+                15,
+                FontStyle.Bold
+            );
+            int findPos = 0;
+            
+
+            string[] split = summary3.Split(' ');
+            foreach (string item in split)
+            {
+                findPos = 0;
+                while (findPos < richTextBox1.Find(item, findPos, RichTextBoxFinds.None))
+                {
+                    findPos = richTextBox1.Find(item, findPos, RichTextBoxFinds.None);
+                    if (findPos != -1)
+                    {
+                        richTextBox1.SelectionBackColor = Color.Yellow;
+                        richTextBox1.SelectionFont = newFont;
+                        findPos += item.Length;
+                    }
+                    else
+                    {
+                        break;
+                    }
+                }
+            }
+            
+            foreach(string ans in answer)
+            {
+                string[] split2 = ans.Split(' ');
+                foreach (string item in split2)
+                {
+                    findPos = 0;
+                    while (findPos < richTextBox1.Find(item, findPos, RichTextBoxFinds.None))
+                    {
+                        findPos = richTextBox1.Find(item, findPos, RichTextBoxFinds.None);
+                        if (findPos != -1)
+                        {
+                            richTextBox1.SelectionBackColor = Color.LightPink;
+                            richTextBox1.SelectionFont = newFont;
+                            findPos += item.Length;
+                        }
+                        else
+                        {
+                            break;
+                        }
+                    }
+                }
+            }
+            richTextBox1.DeselectAll();
         }
 
         private void Naver_Api(string query, string type, int mul, string name)
@@ -706,19 +755,15 @@ namespace WindowsFormsApplication2
                                     }
                                 }
                             }
-                            string title = array.items[j].ToString();
+                       
                             foreach (string item in SearchWords)
                             {
-                              
-                                if (WordCheck(title, item) > 0)
-                                {
-                                    count[i] += WordCheck(title, item);
-                                }
+                                count[i] += WordCheck(array.items[j].ToString(), item);  
                             }
                             //// 19.03.03 New                
                             int cnt = 0;
                             string description = array.items[j].description.ToString();
-                            string[] split2 = summary2.Split(' ');
+                            string[] split2 = summary3.Split(' ');
                             foreach (string item in split2)
                             {
                                 SearchWords.Add(item);
@@ -756,18 +801,17 @@ namespace WindowsFormsApplication2
                     num[i] += count[i];
 
 
-                max_string = Change_RichText(max_string);
+                //max_string = Change_RichText(max_string);
                 if (max_backup < max)
                 {
                     richTextBox1.Clear();
-                    //richTextBox1.Rtf = max_string.ToString();
-                    richTextBox1.SelectedText = max + ":" + max_string + "\r\n" + "\r\n";
+                    richTextBox1.Text = name + ":" + max_string + "\r\n" + "\r\n";
                     max_backup = max;
 
                 }
                 else if(max_backup == max)
                 {
-                    richTextBox1.SelectedText += max + ":" + max_string + "\r\n" + "\r\n";
+                    richTextBox1.Text += name + ":" + max_string + "\r\n" + "\r\n";
                 }
                 max = 0;
             }
@@ -841,18 +885,13 @@ namespace WindowsFormsApplication2
                             }
                             foreach (string item in SearchWords)
                             {
-                                string title = array.documents[j].ToString();
-                                if (WordCheck(title, item) > 0)
-                                {
-                                    count[i] += WordCheck(title, item);
-                                    
-                                }
+                                count[i] += WordCheck(array.documents[j].ToString(), item);
                             }
 
                             //// 19.03.03 New                
                             int cnt = 0;
                             string description = array.documents[j].contents.ToString();
-                            string[] split2 = summary2.Split(' ');
+                            string[] split2 = summary3.Split(' ');
                             foreach (string item in split2)
                             {
                                 SearchWords.Add(item);
@@ -887,17 +926,124 @@ namespace WindowsFormsApplication2
             for (int i = 0; i < 4; i++)
                 num[i] += count[i];
 
-            max_string = Change_RichText(max_string);
+            //max_string = Change_RichText(max_string);
             if (max_backup < max)
             {
                 richTextBox1.Clear();
 
-               richTextBox1.SelectedText = max + ":" + max_string + "\r\n" + "\r\n";
+               richTextBox1.Text = name + ":" + max_string + "\r\n" + "\r\n";
                 max_backup = max;
             }
             else if (max_backup == max)
             {
-                richTextBox1.SelectedText += max + ":" + max_string + "\r\n" + "\r\n";
+                richTextBox1.Text += name + ":" + max_string + "\r\n" + "\r\n";
+
+            }
+            max = 0;
+        }
+
+        private void Google_Api(string query, string type, int mul, string name)
+        {
+            int[] count = new int[4];
+            string max_string = "";
+
+            string key = "AIzaSyCDTLkDc32T5fDr5X_q996oLGyfJDiSbFI";   // Key 값
+            string cx = "016579010870443760250:wnciziq98ro";     // 검색 엔진 ID
+
+
+            string url = "https://www.googleapis.com/customsearch/v1?key=" + key + "&cx=" + cx + "&q=" + query;
+
+            HttpWebRequest request = (HttpWebRequest)WebRequest.Create(url);
+
+            // 요청, 응답 받기
+            try
+            {
+                HttpWebResponse response = (HttpWebResponse)request.GetResponse();
+                string status = response.StatusCode.ToString();
+                if (status == "OK")
+                {
+                    // 응답 Stream 읽기
+                    Stream stream = response.GetResponseStream();
+                    StreamReader reader = new StreamReader(stream, Encoding.UTF8);
+
+                    // 응답 Stream -> 응답 String 변환
+                    string text = reader.ReadToEnd();
+                    dynamic array = JsonConvert.DeserializeObject(text);
+
+                    foreach(var item in array.items)
+                    {
+                        List<string> SearchWords = new List<string>();
+
+                        //snippet
+
+                        
+                        for (int i = 0; i < 4; i++)
+                        {
+                            if (answer[i] != null)
+                            {
+                                string[] split = answer[i].Split(' ');
+                                foreach (string spt in split)
+                                {
+                                    if (spt.Count() > 1)
+                                    {
+                                        SearchWords.Add(spt);
+                                    }
+                                }
+                            }
+                            foreach (string spt in SearchWords)
+                            {
+                                count[i] += WordCheck(item.snippet.ToString(), spt);
+                            }
+
+                            //// 19.03.03 New                
+                            int cnt = 0;
+                            string description = item.snippet.ToString();
+                            string[] split2 = summary3.Split(' ');
+                            foreach (string spt in split2)
+                            {
+                                SearchWords.Add(spt);
+                            }
+                            foreach (string word in SearchWords)
+                            {
+                                if (WordCheck(description, word) > 0)
+                                {
+                                    cnt++;
+                                }
+                            }
+                            if (cnt > max)
+                            {
+                                max = cnt;
+                                max_string = description;
+                            }
+                            SearchWords.Clear();
+                        }
+                    }
+                }
+                else
+                {
+                    Console.WriteLine("Error 발생=" + status);
+                }
+            }
+            catch (WebException e)
+            {
+            }
+            textBox8.Text += "  " + stopwatch.Elapsed.ToString();
+            textBox8.Text += ":  " + count[0].ToString() + " " + count[1].ToString() + " " + count[2].ToString() + " " + count[3].ToString() + " " + name + "\r\n";
+
+            for (int i = 0; i < 4; i++)
+                num[i] += count[i];
+
+            //max_string = Change_RichText(max_string);
+            if (max_backup < max)
+            {
+                richTextBox1.Clear();
+
+                richTextBox1.Text = name + ":" + max_string + "\r\n" + "\r\n";
+                max_backup = max;
+            }
+            else if (max_backup == max)
+            {
+                richTextBox1.Text += name + ":" + max_string + "\r\n" + "\r\n";
 
             }
             max = 0;
@@ -920,23 +1066,7 @@ namespace WindowsFormsApplication2
 
             // 공간 없애기
             question = CleanInput(question);
-            /*
-            question = question.Replace("\n", " ");
-            question = question.Replace("?", "");
-            question = question.Replace("|", "");
-            question = question.Replace(",", "");
-            question = question.Replace(".", "");
-            question = question.Replace("[", "");
-            question = question.Replace("]", "");
-            question = question.Replace("!", "");
-            question = question.Replace("\"", "");
-
-            question = question.Replace("/", "");
-            
-            question = question.Replace("  ", " ");
-            question = question.Trim(); // 선후행 공백 제거
-            */
-            
+                        
             for (int i = 0; i < 4; i++)
             {
                 if (answer[i] != null)
@@ -978,35 +1108,6 @@ namespace WindowsFormsApplication2
             textBox5.Text = answer[3];
 
             textBox8.Text = answer[0] + "  " + answer[1] + "  " + answer[2] + "  " + answer[3] +"\r\n" +"\r\n";
-
-            // Question 명사, 동사 추출
-            StringBuilder result = new StringBuilder();
-            var tokens = TwitterKoreanProcessorCS.Tokenize(question);
-
-            foreach (var token in tokens)
-            {
-                if (token.Pos.ToString() == "Noun" || token.Pos.ToString() == "ProperNoun" || token.Pos.ToString() == "Verb")
-                {
-                    result.AppendFormat(format: "{0} ",
-                    args: new object[] { token.Text });
-                }
-            }
-            summary = result.ToString();
-            textBox1.Text += summary + "\r\n";
-
-            // 명사만
-            StringBuilder result2 = new StringBuilder();
-            foreach (var token in tokens)
-            {
-                if (token.Pos.ToString() == "Noun" || token.Pos.ToString() == "ProperNoun")
-                {
-                    result2.AppendFormat(format: "{0} ",
-                    args: new object[] { token.Text });
-                }
-            }
-            summary2 = result2.ToString();
-            textBox1.Text += summary2 + "\r\n";
-
         }
 
         private void Wiki_QA(string question)
@@ -1038,7 +1139,46 @@ namespace WindowsFormsApplication2
             }
         }
 
-        
+        private void ExoBrain_API()
+        {
+            var httpWebRequest = (HttpWebRequest)WebRequest.Create("http://aiopen.etri.re.kr:8000/WiseNLU");
+            httpWebRequest.ContentType = "text/json";
+            httpWebRequest.Method = "POST";
+            summary3 = "";
+
+
+            using (var streamWriter = new StreamWriter(httpWebRequest.GetRequestStream()))
+            {
+                string json = "{\"access_key\": \"cad0208b-f4a6-4afa-b5fa-8b60ccf76a40\", " +
+                                  "  \"argument\": {" +
+                                  "  \"analysis_code\": \"morp\"," +
+                                  "  \"text\": \"" + question + "\"" +
+                                  "   }" +
+                                  "}";
+                streamWriter.Write(json);
+            }
+            var httpResponse = (HttpWebResponse)httpWebRequest.GetResponse();
+            using (var streamReader = new StreamReader(httpResponse.GetResponseStream()))
+            {
+                var responseText = streamReader.ReadToEnd();
+                //Now you have your response.
+                //or false depending on information in the response
+
+                dynamic array = JsonConvert.DeserializeObject(responseText);
+
+                //textBox9.Text = array.return_object.WiKiInfo.AnswerInfo.ToString();
+
+                foreach (var item in array.return_object.sentence[0].morp)
+                {
+                    if (item.type == "NN" || item.type == "NNG" || item.type == "NNP" || item.type == "NNB"|| item.type == "NP"|| item.type == "NR")
+                    {
+                        textBox1.Text += item.lemma + "(" + item.type +") ";
+                        summary3 += item.lemma + " ";
+                    }
+                }
+            }
+        }
+
 
         private void capture_and_search()
         {
@@ -1052,6 +1192,7 @@ namespace WindowsFormsApplication2
 
             // Capture
             Image capture = print_picture();
+
 
             pictureBox2.Image = capture;
 
@@ -1106,6 +1247,7 @@ namespace WindowsFormsApplication2
                 }
                 else
                 {//정상 처리
+                    
                     text = annotateImageResponse.TextAnnotations[0].Description;//.Replace("\n", "\r\n");
 
                     string[] response = new string[5];
@@ -1127,6 +1269,22 @@ namespace WindowsFormsApplication2
                             }
                         }
                     }
+                    
+
+                    //string[] response = new string[5];
+                    //annotateImageResponse.FullTextAnnotation.Pages[0].Blocks.Count
+
+                    /*
+                    foreach(var item in annotateImageResponse.TextAnnotations)
+                    {
+                        int x = item.BoundingPoly.Vertices[0].X;
+                        int y = item.BoundingPoly.Vertices[0].Y;
+
+                        if(x > 0)
+                        {
+                            if(y <capture.Height * 364 / 1000 )
+                        }
+                    }*/
 
                     question = response[0];
 
@@ -1138,20 +1296,22 @@ namespace WindowsFormsApplication2
                             answer_cnt++;
                         }
                     }
+                    
                 }
             }
             summary_qna();  // 문답 정리
+            ExoBrain_API(); 
             ////////////////////////////////////// 검색 단계 //////////////////////////////////////
 
             //UTF8로 바꾸기
             //인코딩 방식을 지정
-            System.Text.Encoding utf8 = System.Text.Encoding.UTF8;
+            //System.Text.Encoding utf8 = System.Text.Encoding.UTF8;
 
             //변환하고자 하는 문자열을 UTF8 방식으로 변환하여 byte 배열로 반환
             // UTF8 → Byte
             //string convertUtoB(quest_answer);
 
-            
+            /*
             byte[] utf8Bytes = utf8.GetBytes(question);
             byte[] utf8BytesSPACE = utf8.GetBytes(" ");
             byte[] utf8Summary = utf8.GetBytes(summary);
@@ -1195,8 +1355,9 @@ namespace WindowsFormsApplication2
             foreach (byte b in utf8BytesA4)
             {
                 utf8StringQA4 += "%" + String.Format("{0:X}", b);
-            }
+            }*/
 
+            /*
             string url1 = "https://search.naver.com/search.naver?where=nexearch&sm=top_hty&fbm=1&ie=utf8&query=" + utf8String;  // Naver
             string url1_1 = "https://search.naver.com/search.naver?where=nexearch&sm=top_hty&fbm=1&ie=utf8&query=" + utf8StringSum; //Naver 요약
 
@@ -1207,11 +1368,11 @@ namespace WindowsFormsApplication2
             string url1_3_3 = "https://search.naver.com/search.naver?where=nexearch&sm=top_hty&fbm=1&ie=utf8&query=" + utf8String + utf8StringSPACE + utf8StringQA3;  // Naver 문답3
             string url1_3_4 = "https://search.naver.com/search.naver?where=nexearch&sm=top_hty&fbm=1&ie=utf8&query=" + utf8String + utf8StringSPACE + utf8StringQA4;  // Naver 문답4
 
-
-            string url2 = "https://www.google.co.kr/search?q=" + question + " " + answer[0] + " " + answer[1] + " " + answer[2] + " " + answer[3];
-            string url2_1 = "https://www.google.co.kr/search?q=" + question;
-            string url2_2 = "https://www.google.co.kr/search?q=" + summary;
-
+    */
+            //string url2 = "https://www.google.co.kr/search?q=" + question + " " + answer[0] + " " + answer[1] + " " + answer[2] + " " + answer[3];
+            //string url2_1 = "https://www.google.co.kr/search?q=" + question;
+            //string url2_2 = "https://www.google.co.kr/search?q=" + summary3;
+            /*
             string url8_1 = "https://www.google.co.kr/search?q=" + question + " " + answer[0];
             string url8_2 = "https://www.google.co.kr/search?q=" + question + " " + answer[1];
             string url8_3 = "https://www.google.co.kr/search?q=" + question + " " + answer[2];
@@ -1222,38 +1383,47 @@ namespace WindowsFormsApplication2
             string url5 = "https://hanja.dict.naver.com/word?q=" + utf8String; // Naver 한자사전
             //string url6 = "http://alldic.daum.net/grammar_checker.do"; // 다음 맞춤법 
             string url7 = "https://search.daum.net/search?w=tot&DA=YZR&t__nil_searchbox=btn&sug=&sugo=&q=" + utf8String; // 다음 검색
+            */
             
             Naver_Api(question, "blog", 1, "Naver 블로그");
             Naver_Api(question, "news", 1, "Naver 뉴스");
-            Naver_Api(question, "encyc", 1, "Naver 백과사전");
+            //Naver_Api(question, "encyc", 1, "Naver 백과사전");
             
             // Naver_Api(question, "webkr", 1, "Naver 웹문서");
             // Naver_Api(question, "doc", 1, "Naver 전문자료");
 
-            Naver_Api(summary, "blog", 1, "Naver summary");
+            Naver_Api(summary3, "blog", 1, "Naver summary");
             //Naver_Api(summary2, "blog", 1, "Naver summary2");
 
             Daum_Api(question, "blog", 1, "Daum 블로그");
-            Daum_Api(question, "web", 1, "Daum web 문서");
-            Daum_Api(summary, "blog", 1, "Daum summary");
+            //Daum_Api(question, "web", 1, "Daum web 문서");
+            Daum_Api(summary3, "blog", 1, "Daum summary");
+
+            Google_Api(question, "검색", 1, "Google");
+            Google_Api(summary3, "검색", 1, "Google summary");
 
             // Internet Browser
-            webBrowser1.Navigate(url2_1); //Google + 문 // +5 
+            //webBrowser1.Navigate(url2_1); //Google + 문 // +5 
             //webBrowser2.Navigate(url7); // 다음검색
             //webBrowser3.Navigate(url2); //Google + 문답
-            webBrowser3.Navigate(url2_2); //Google + 문 요약
+            //webBrowser3.Navigate(url2_2); //Google + 문 요약
                                           //webBrowser4.Navigate(url5);
 
-            if ((num[0] + num[1] + num[2] + num[3]) < 5)
+            if (((num[0] + num[1] + num[2] + num[3]) < 5) && (answer[2] != "" || answer[3] != ""))
             {
                 foreach (string str in answer)
                 {
-                    Naver_Api(str + " " + summary, "blog", 1, "Naver 답 포함");
+                    Naver_Api(str + " " + summary3, "blog", 1, "Naver 답 포함");
                 }
             }
             //Wiki_QA(question);
+            
+
+            Change_RichText();
 
             print_answer();
+
+
         }
     }
 
